@@ -1,0 +1,75 @@
+diff --git a/memtoy/memtoy b/memtoy/memtoy
+index e850ca2..d1ccff6 100755
+Binary files a/memtoy/memtoy and b/memtoy/memtoy differ
+diff --git a/memtoy/memtoy.cpp b/memtoy/memtoy.cpp
+index 948a492..63b9e2b 100644
+--- a/memtoy/memtoy.cpp
++++ b/memtoy/memtoy.cpp
+@@ -66,21 +66,30 @@ int main(int argc, char *argv[]){
+ 
+ 
+     if(argc <= 1){
+-        printf("Usage : ./linuxmem { filename } { \"print\" (optional)  } \n");
++        printf("Usage : ./linuxmem { filename | 0(no save) } { \"print\" (optional)  } \n");
+         exit(1);
+     }
+ 
+     printf(" %s %s %s \n", argv[0], argv[1], argv[2] );
+     char line[100] = {0, };
+-    char outfile[100] = {0, };
+-    strcpy(outfile, argv[1]);
+-    strcat(outfile, ".csv");
+-    outputFile = fopen(outfile, "w");
+-    if(!outputFile){
+-        printf("File creation failed \n");
+-        exit(1);
++
++
++
++    //save file
++    if(strcmp(argv[1], "0") == 0){
++        //no save
+     }
+-    
++    else{
++        char outfile[100] = {0, };
++        strcpy(outfile, argv[1]);
++        strcat(outfile, ".csv");
++        outputFile = fopen(outfile, "w");
++        if(!outputFile){
++            printf("File creation failed \n");
++            exit(1);
++        }
++    }
++
+     bool isPrint = false;
+     if(argc >= 3){
+         if(strcmp(argv[2], "print") == 0){
+@@ -88,10 +97,12 @@ int main(int argc, char *argv[]){
+         }
+     }
+ 
+-    //fields
+-    memset(line, 0, sizeof(line));
+-    strcpy(line, "sec, usec, total, free, used\n");
+-    fwrite(line, 1, strlen(line), outputFile);
++    //write fields
++    if(outputFile){
++        memset(line, 0, sizeof(line));
++        strcpy(line, "sec, usec, total, free, used\n");
++        fwrite(line, 1, strlen(line), outputFile);
++    }
+ 
+     while(1){
+         gettimeofday(&tv, 0);
+@@ -107,9 +118,9 @@ int main(int argc, char *argv[]){
+             memset(line, 0, sizeof(line));
+             sprintf(line, "%d, %d, %d, %d, %d \n", sec, usec, total, free, total-free);
+             fwrite(line, 1, strlen(line), outputFile);
++            fflush(outputFile);
+         }
+         
+-        fflush(outputFile);
+         sleep(1);
+     }
+ 
