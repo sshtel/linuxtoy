@@ -100,23 +100,29 @@ int main(int argc, char *argv[]){
     //write fields
     if(outputFile){
         memset(line, 0, sizeof(line));
-        strcpy(line, "sec, usec, total, free, used\n");
+        strcpy(line, "time, total, free, used\n");
         fwrite(line, 1, strlen(line), outputFile);
     }
 
+    //beginning time
+    long beginSec = 0;
+    gettimeofday(&tv, 0);
+    beginSec = tv.tv_sec;
     while(1){
         gettimeofday(&tv, 0);
-        sec = tv.tv_sec;
+        sec = tv.tv_sec - beginSec;
         usec = tv.tv_usec;
         getMemInfo(&total, &free);
 
+
+        memset(line, 0, sizeof(line));
+        sprintf(line, "%d.%000006d, %d, %d, %d \n", sec, usec, total, free, total-free);
         if(isPrint){
-            printf("%d,\t%d,\t", sec, usec);
-            printf("%d,\t%d,\t%d\t\n", total, free, total-free);
+            printf("%s", line);
+            //printf("%d.%000006d,\t", sec, usec);
+            //printf("%d,\t%d,\t%d\t\n", total, free, total-free);
         }
         if(outputFile){
-            memset(line, 0, sizeof(line));
-            sprintf(line, "%d, %d, %d, %d, %d \n", sec, usec, total, free, total-free);
             fwrite(line, 1, strlen(line), outputFile);
             fflush(outputFile);
         }
