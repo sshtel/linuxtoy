@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <time.h>
 
 
 #define MEMINFO "/proc/meminfo"
@@ -53,7 +54,6 @@ int getMemInfo(int *total, int *free){
 
 
     return 0;
-
 }
 
 int main(int argc, char *argv[]){
@@ -64,9 +64,11 @@ int main(int argc, char *argv[]){
     //Normal Loop
     FILE *outputFile = 0;
 
+    time_t current_time;
+    struct tm *st;
 
     if(argc <= 1){
-        printf("Usage : ./linuxmem { filename | 0(no save) } { \"print\" (optional)  } \n");
+        printf("Usage : ./linuxmem { filename | 0(no save) } { interval(sec) } { \"print\" (optional)  } \n");
         exit(1);
     }
 
@@ -90,9 +92,21 @@ int main(int argc, char *argv[]){
         }
     }
 
-    bool isPrint = false;
+    int interval_sec = 1;
     if(argc >= 3){
-        if(strcmp(argv[2], "print") == 0){
+        if(strlen(argv[2]) > 1){ 
+            printf("wrong parameter\n"); 
+            printf("Usage : ./linuxmem { filename | 0(no save) } { interval(sec) } { \"print\" (optional)  } \n");
+            exit(1); 
+        }
+        interval_sec = atoi(argv[2]);
+        if(interval_sec == 0) interval_sec = 1;
+         
+    }
+
+    bool isPrint = false;
+    if(argc >= 4){
+        if(strcmp(argv[3], "print") == 0){
             isPrint = true;
         }
     }
@@ -100,7 +114,7 @@ int main(int argc, char *argv[]){
     //write fields
     if(outputFile){
         memset(line, 0, sizeof(line));
-        strcpy(line, "time, total, free, used\n");
+        strcpy(line, "date, time, total, free, used\n");
         fwrite(line, 1, strlen(line), outputFile);
     }
 
@@ -108,26 +122,41 @@ int main(int argc, char *argv[]){
     long beginSec = 0;
     gettimeofday(&tv, 0);
     beginSec = tv.tv_sec;
+
+
     while(1){
         gettimeofday(&tv, 0);
         sec = tv.tv_sec - beginSec;
         usec = tv.tv_usec;
+
+        time(&current_time);
+        st = localtime(&current_time);
+
         getMemInfo(&total, &free);
 
-
         memset(line, 0, sizeof(line));
-        sprintf(line, "%d.%000006d, %d, %d, %d \n", sec, usec, total, free, total-free);
+        sprintf(line, "%0004d-%02d-%02d,\t%02d:%02d:%02d, \t%d,\t%d,\t%d\n", 
+                st->tm_year + 1900,
+                st->tm_mon + 1,
+                st->tm_mday,
+                st->tm_hour,
+                st->tm_min,
+                st->tm_sec,
+                total,
+                free,
+                total-free);
+        //sprintf(line, "%d.%000006d,\t%d,\t%d,\t%d\n", sec, usec, total, free, total-free);
+
+
         if(isPrint){
             printf("%s", line);
-            //printf("%d.%000006d,\t", sec, usec);
-            //printf("%d,\t%d,\t%d\t\n", total, free, total-free);
         }
         if(outputFile){
             fwrite(line, 1, strlen(line), outputFile);
             fflush(outputFile);
         }
         
-        sleep(1);
+        sleep(interval_sec);
     }
 
     if(outputFile){

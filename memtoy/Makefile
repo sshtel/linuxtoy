@@ -1,4 +1,4 @@
-#CXX=arm-none-linux-gnueabi-g++
+CXX=arm-none-linux-gnueabi-g++
 CXX=g++
 OUTPUT=memtoy
 
