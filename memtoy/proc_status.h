@@ -1,14 +1,12 @@
 #ifndef __PROC_STATUS_H
 #define __PROC_STATUS_H
 
-#define VMPEAK_B    0
-#define VMHWM_B     4
-#define VMRSS_B     5
+typedef struct {
+    int vmPeak;
+    int vmHWM;
+    int vmRSS;
+} ProcStatus;
 
-
-void getVmPeak(int pid, int *vmPeak);
-void getVmHWM(int pid, int *vmHWM);
-void getVmRSS(int pid, int *vmRSS);
-
+void get_proc_stat(int pid, ProcStatus *procStatus);
 
 #endif

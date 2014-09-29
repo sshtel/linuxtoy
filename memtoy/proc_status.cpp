@@ -7,13 +7,18 @@
 #define PROC "/proc"
 #define STAT "/status"
 
+#define VMPEAK_B    0
+#define VMHWM_B     4
+#define VMRSS_B     5
+
+
 char *vm_str[64] = { 
-    "VmPeak:", 
-    "", 
-    "", 
-    "", 
-    "VmHWM:", 
-    "VmRSS:" 
+    "VmPeak:",      //VMPEAK_B
+    "",             //1
+    "",             //2
+    "",             //3
+    "VmHWM:",       //VMHWM_B
+    "VmRSS:"        //VMRSS_B
 };
 
 
@@ -22,18 +27,62 @@ bool checkAndGet(char *str, int id, int *value){
     if(str == NULL) return false;
     if(id > 64 || id < 0) return false;
     char *tok;
-    tok = strtok(str, " ");
+    tok = strtok(str, " \t");
 
-        printf("tok: %s\n ", str);
     if(strcmp(tok, vm_str[id]) == 0){
-        tok = strtok(NULL , " ");
-        printf("tok: %s\n ", tok);
+        tok = strtok(NULL , " \t");
+        //printf("tok: %s\n ", tok);
         *value= atoi(tok);
         return true;
     }
     return false;
 }
 
+void get_proc_stat(int pid, ProcStatus *procStatus)
+{
+
+    int vmPeak, vmHWM, vmRSS;
+
+    FILE * statusFile;
+    char buffer[100] = {0, };
+    size_t result;
+
+    char status_file[32];
+    sprintf(status_file, "/proc/%d/status", pid);
+
+    statusFile = fopen (status_file , "r" );
+    if (statusFile==NULL) {fputs ("File error\n",stderr); exit (1);}
+
+    char *tok;
+
+    while(fgets(buffer, sizeof(buffer), statusFile)){
+        tok = strtok(buffer, " \t");
+
+        if(strcmp(tok, vm_str[VMPEAK_B]) == 0){
+            tok = strtok(NULL , " \t");
+            //printf("tok: %s\n ", tok);
+            vmPeak = atoi(tok);
+        }
+        else if(strcmp(tok, vm_str[VMHWM_B]) == 0){
+            tok = strtok(NULL , " \t");
+            //printf("tok: %s\n ", tok);
+            vmHWM = atoi(tok);
+        }
+        else if(strcmp(tok, vm_str[VMRSS_B]) == 0){
+            tok = strtok(NULL , " \t");
+            //printf("tok: %s\n ", tok);
+            vmRSS = atoi(tok);
+        }
+        else{   continue; }
+    }
+    fclose(statusFile);
+
+    procStatus->vmPeak = vmPeak;
+    procStatus->vmHWM = vmHWM;
+    procStatus->vmRSS = vmRSS;
+
+
+}
 
 void getVmPeak(int pid, int *vmPeak){
     FILE * statusFile;

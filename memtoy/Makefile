@@ -3,4 +3,4 @@ CXX=g++
 OUTPUT=memtoy
 
 all:
-	$(CXX) memtoy.cpp -o $(OUTPUT) 
+	$(CXX) main.cpp meminfo.cpp proc_status.cpp -o $(OUTPUT) 
