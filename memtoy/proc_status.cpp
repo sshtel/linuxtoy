@@ -67,7 +67,7 @@ int get_proc_stat(int pid, ProcStatus *procStatus)
             vmPeak = atoi(tok);
         }
         else if(strcmp(tok, vm_str[VMHWM_B]) == 0){
-            tok = strtok(NULL , " \t");
+            //tok = strtok(NULL , " \t");
             printf("tok: %s\n ", tok);
             vmHWM = atoi(tok);
         }
