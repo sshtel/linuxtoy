@@ -38,10 +38,9 @@ bool checkAndGet(char *str, int id, int *value){
     return false;
 }
 
-void get_proc_stat(int pid, ProcStatus *procStatus)
+int get_proc_stat(int pid, ProcStatus *procStatus)
 {
-
-    int vmPeak, vmHWM, vmRSS;
+    int vmPeak = 0, vmHWM = 0, vmRSS = 0;
 
     FILE * statusFile;
     char buffer[100] = {0, };
@@ -49,9 +48,13 @@ void get_proc_stat(int pid, ProcStatus *procStatus)
 
     char status_file[32];
     sprintf(status_file, "/proc/%d/status", pid);
-
     statusFile = fopen (status_file , "r" );
-    if (statusFile==NULL) {fputs ("File error\n",stderr); exit (1);}
+    if (statusFile==NULL) { //fputs ("File error\n",stderr); 
+        procStatus->vmPeak = 0;
+        procStatus->vmHWM = 0;
+        procStatus->vmRSS = 0;
+        return -1;
+    }
 
     char *tok;
 
@@ -65,7 +68,7 @@ void get_proc_stat(int pid, ProcStatus *procStatus)
         }
         else if(strcmp(tok, vm_str[VMHWM_B]) == 0){
             tok = strtok(NULL , " \t");
-            //printf("tok: %s\n ", tok);
+            printf("tok: %s\n ", tok);
             vmHWM = atoi(tok);
         }
         else if(strcmp(tok, vm_str[VMRSS_B]) == 0){
@@ -81,7 +84,7 @@ void get_proc_stat(int pid, ProcStatus *procStatus)
     procStatus->vmHWM = vmHWM;
     procStatus->vmRSS = vmRSS;
 
-
+    return 0;
 }
 
 void getVmPeak(int pid, int *vmPeak){

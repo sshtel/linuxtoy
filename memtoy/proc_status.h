@@ -7,6 +7,6 @@ typedef struct {
     int vmRSS;
 } ProcStatus;
 
-void get_proc_stat(int pid, ProcStatus *procStatus);
+int get_proc_stat(int pid, ProcStatus *procStatus);
 
 #endif
