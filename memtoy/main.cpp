@@ -119,7 +119,7 @@ int main(int argc, char *argv[]){
         memset(time_line, 0, sizeof(time_line));
         memset(line, 0, sizeof(line));
         memset(proc_status_line, 0, sizeof(proc_status_line));
-        sprintf(time_line, "%0004d-%02d-%02d %02d:%02d:%02d",
+        sprintf(time_line, "%0004d-%02d-%02d,%02d:%02d:%02d",
                 st->tm_year + 1900,
                 st->tm_mon + 1,
                 st->tm_mday,
