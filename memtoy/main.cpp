@@ -11,7 +11,7 @@
 using namespace std;
 
 void printUsage(){
-    printf("Usage  : ./memtoy { option } { pid }  { interval(sec) }  { filename (optional) }\n"
+    printf("Usage  : ./memtoy { option } { pid }  { interval(sec, [1,999]) }  { filename (optional) }\n"
            "Option : \"print\" \n"
             );
 }
@@ -51,7 +51,7 @@ int main(int argc, char *argv[]){
 
     //interval
     int interval_sec = 1;
-    if(strlen(argv[3]) > 1){ 
+    if(strlen(argv[3]) > 3){ 
         printf("wrong parameter\n"); 
         printUsage();
         exit(1); 
