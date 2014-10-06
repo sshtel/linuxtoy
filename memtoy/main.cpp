@@ -11,8 +11,8 @@
 using namespace std;
 
 void printUsage(){
-    printf("Usage  : ./memtoy { option } { pid }  { interval(sec, [1,999]) }  { filename (optional) }\n"
-           "Option : \"print\" \n"
+    printf("Usage  : ./memtoy { option } { pid }  { interval(sec, [1,999]) }  { filename optional) }\n"
+           "Option : \"print\" | \"log\"  \n"
             );
 }
 
@@ -32,17 +32,19 @@ int main(int argc, char *argv[]){
     printf(" %s %s %s %s %s\n", argv[0], argv[1], argv[2], argv[3], argv[4] );
 
     bool isPrint = false;
+    bool isLog = false;
     if(strcmp(argv[1], "print") == 0){
         isPrint = true;
     }
-    else if(strcmp(argv[1], "meminfo") == 0){
+    else if(strcmp(argv[1], "log") == 0){
         isPrint = true;
+        isLog = true;
     }
     else{
         printUsage();
         exit(1);
     }
-
+    
     //pid
     int pid = atoi(argv[2]);
     if(pid < 0){
@@ -59,19 +61,40 @@ int main(int argc, char *argv[]){
     interval_sec = atoi(argv[3]);
     if(interval_sec == 0) interval_sec = 1;
 
-
     //save file
-    if(argc >= 5 ){
-        char outfile[100] = {0, };
-        strcpy(outfile, argv[4]);
-        strcat(outfile, ".csv");
+
+    if(isLog){
+        time(&current_time);
+        st = localtime(&current_time);
+        char outfile[256] = {0, };
+        char date[32];
+        sprintf(date, "%0004d%02d%02d_%02d%02d%02d",
+                st->tm_year + 1900,
+                st->tm_mon + 1,
+                st->tm_mday,
+                st->tm_hour,
+                st->tm_min,
+                st->tm_sec);
+
+        if(argc >= 5 ){
+            strcpy(outfile, argv[4]);
+            strcat(outfile, "_");
+            strcat(outfile, date);
+            strcat(outfile, ".csv");
+        }
+        else{
+            strcpy(outfile, date);
+            strcat(outfile, ".csv");
+        }
         outputFile = fopen(outfile, "w");
         if(!outputFile){
             printf("File creation failed \n");
             exit(1);
         }
     }
-
+    else{
+        outputFile = 0;
+    }
 
     char time_line[128] = {0, };
     char line[128] = {0, };
@@ -92,21 +115,10 @@ int main(int argc, char *argv[]){
     }
 
     int total, free, buffers, cached;
-    struct timeval tv;
-    long sec, usec;
     ProcStatus pStat;
-
-    //beginning time
-    long beginSec = 0;
-    gettimeofday(&tv, 0);
-    beginSec = tv.tv_sec;
 
     int printColumnCount = 0;
     while(1){
-        gettimeofday(&tv, 0);
-        sec = tv.tv_sec - beginSec;
-        usec = tv.tv_usec;
-
         time(&current_time);
         st = localtime(&current_time);
 
