@@ -1,5 +1,5 @@
-CC=arm-hisiv200-linux-gnueabi-gcc
-#CC=gcc
+#CC=arm-linux-gnueabi-gcc
+CC=gcc
 
 TARGET=arm-linux
 
@@ -24,7 +24,7 @@ libbmp_unzip:
 
 libbmp_build: libbmp_unzip
 	cd $(LIBBMP) && ./configure --target=$(TARGET) --host=$(TARGET) CC=$(CC)
-	cd $(LIBBMP) && make
+	cd $(LIBBMP) && make clean && make
 	cd $(LIBBMP)/src && cp bmpfile.o $(ROOTDIR)
 
 libbmp_patch:
