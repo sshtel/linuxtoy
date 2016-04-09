@@ -14,7 +14,7 @@ echo "set ssl_starttls=yes" >> $OUTPUT
 echo "set ssl_force_tls=yes" >> $OUTPUT
 echo "" >> $OUTPUT
 echo "set realname=$3" >> $OUTPUT
-#echo "set from=$4" >> $OUTPUT
+#echo "set from=$3" >> $OUTPUT
 #echo "set use_from=yes" >> $OUTPUT
 echo "" >> $OUTPUT
 echo "set smtp_url=$1:$2" >> $OUTPUT
