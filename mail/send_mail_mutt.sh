@@ -14,18 +14,19 @@ for var in "$@"
 do
 	if [ "$RECIPIENT" == "" ] ; then
 	RECIPIENT=$var
-	echo $var
 	elif [ "$MAILBODY" == "" ] ; then
 	MAILBODY=$var
-	echo $var
 	else
 	ATTACHED_FILES+=" "
 	ATTACHED_FILES+=$var
 	fi
 done
 
+	echo Recipient : $RECIPIENT
+	echo mail body : $MAILBODY
+	echo attached files : $ATTACHED_FILES
+
 	if [ -f $MUTTRC ] ; then
-	echo with mutt!!
 	mutt -F .muttrc -s "Raspberry pi" -a $ATTACHED_FILES -- $RECIPIENT < $MAILBODY
 	else
 	mutt -s "Raspberry pi" -a $ATTACHED_FILES -- $RECIPIENT < $MAILBODY
